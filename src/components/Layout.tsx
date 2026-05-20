@@ -70,7 +70,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         { to: "/book-section/security-deposit", label: "Security Deposit", icon: Lock, visible: isCFORole },
         { to: "/book-section/pol-bills", label: "POL Bills", icon: FileText, visible: isCFORole },
         { to: "/book-section/contingencies", label: "Contingencies", icon: AlertCircle, visible: isCFORole },
-        { to: "/book-section/bill-dispatch", label: "Bill Dispatch", icon: ArrowLeftRight, visible: isCFORole },
+        { to: "/book-section/bill-dispatch", label: "Bill Dispatch", icon: ArrowLeftRight, visible: false },
         { to: "/book-section/books", label: "Books", icon: BookOpen, visible: isCFORole || userRole === 'books' },
         { to: "/book-section/establishment", label: "Establishment", icon: Users, visible: isCFORole || userRole === 'establishment' },
       ].filter(item => item.visible !== false)
