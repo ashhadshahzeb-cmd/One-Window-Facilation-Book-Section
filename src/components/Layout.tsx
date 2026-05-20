@@ -42,6 +42,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const isCFORole = userRole === 'cfo' || userRole === 'admin' || userRole === 'sub_cfo' || userRole?.startsWith('sub_cfo_') || isAdmin;
   const isRestrictedAsstCFO = userRole?.startsWith('sub_cfo_') && userRole !== 'sub_cfo';
+  const isEmpOperator = userRole === 'emp_operator';
 
   const [showSplash, setShowSplash] = useState(() => {
     if (!isCFORole) return false;
@@ -53,11 +54,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   };
 
   const topNavItems = [
-    { to: "/", icon: LayoutDashboard, label: "Dashboard", visible: !isRestrictedAsstCFO },
-    { to: "/book-section/file-tracking", icon: Shield, label: "File Tracking", visible: true },
-    { to: "/restricted", icon: Lock, label: "Restrict Dashboard", visible: !isRestrictedAsstCFO },
-    { to: "/collection-entry", icon: Plus, label: "Collection Entry", visible: !isRestrictedAsstCFO },
-    { to: "/bank-entries", icon: Landmark, label: "Bank Entries", visible: true },
+    { to: "/", icon: LayoutDashboard, label: "Dashboard", visible: !isRestrictedAsstCFO && !isEmpOperator },
+    { to: "/book-section/file-tracking", icon: Shield, label: "File Tracking", visible: !isEmpOperator },
+    { to: "/restricted", icon: Lock, label: "Restrict Dashboard", visible: !isRestrictedAsstCFO && !isEmpOperator },
+    { to: "/collection-entry", icon: Plus, label: "Collection Entry", visible: !isRestrictedAsstCFO && !isEmpOperator },
+    { to: "/bank-entries", icon: Landmark, label: "Bank Entries", visible: !isEmpOperator },
   ].filter(item => item.visible);
 
   const categories = (userRole || isAdmin) && !isRestrictedAsstCFO ? [
@@ -65,17 +66,17 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       id: "book-section",
       label: "Sections Management",
       items: [
-        { to: "/book-section/emp-details", label: "Employee Details", icon: ListTree, visible: isCFORole },
-        { to: "/book-section/all-employees", label: "Search All Employees", icon: Search, visible: isCFORole },
-        { to: "/book-section/medical", label: "Medical Section", icon: Stethoscope, visible: isCFORole },
-        { to: "/book-section/contractor", label: "Contractor Section", icon: Briefcase, visible: isCFORole },
-        { to: "/book-section/security-deposit", label: "Security Deposit", icon: Lock, visible: isCFORole },
-        { to: "/book-section/pol-bills", label: "POL Bills", icon: FileText, visible: isCFORole },
-        { to: "/book-section/contingencies", label: "Contingencies", icon: AlertCircle, visible: isCFORole },
+        { to: "/book-section/emp-details", label: "Employee Details", icon: ListTree, visible: isCFORole || isEmpOperator },
+        { to: "/book-section/all-employees", label: "Search All Employees", icon: Search, visible: isCFORole || isEmpOperator },
+        { to: "/book-section/medical", label: "Medical Section", icon: Stethoscope, visible: isCFORole && !isEmpOperator },
+        { to: "/book-section/contractor", label: "Contractor Section", icon: Briefcase, visible: isCFORole && !isEmpOperator },
+        { to: "/book-section/security-deposit", label: "Security Deposit", icon: Lock, visible: isCFORole && !isEmpOperator },
+        { to: "/book-section/pol-bills", label: "POL Bills", icon: FileText, visible: isCFORole && !isEmpOperator },
+        { to: "/book-section/contingencies", label: "Contingencies", icon: AlertCircle, visible: isCFORole && !isEmpOperator },
         { to: "/book-section/bill-dispatch", label: "Bill Dispatch", icon: ArrowLeftRight, visible: false },
-        { to: "/book-section/books", label: "Books", icon: BookOpen, visible: isCFORole || userRole === 'books' },
-        { to: "/book-section/establishment", label: "Establishment", icon: Users, visible: isCFORole || userRole === 'establishment' },
-      ].filter(item => item.visible !== false)
+        { to: "/book-section/books", label: "Books", icon: BookOpen, visible: (isCFORole || userRole === 'books') && !isEmpOperator },
+        { to: "/book-section/establishment", label: "Establishment", icon: Users, visible: (isCFORole || userRole === 'establishment') && !isEmpOperator },
+      ].filter(item => item.visible)
     }
   ] : [];
 
@@ -190,34 +191,62 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
       {/* Mobile Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 h-20 bg-card/80 backdrop-blur-xl border-t border-border/50 flex md:hidden items-center justify-around px-6 pb-2 z-50">
-        <Link to="/" className={cn(
-          "flex flex-col items-center gap-1 transition-all duration-300",
-          location.pathname === "/" ? "text-primary scale-110" : "text-muted-foreground"
-        )}>
-          <LayoutDashboard className="w-6 h-6" />
-          <span className="text-[10px] font-medium">Home</span>
-        </Link>
-        <Link to="/book-section/file-tracking" className={cn(
-          "flex flex-col items-center gap-1 transition-all duration-300",
-          location.pathname === "/book-section/file-tracking" ? "text-primary scale-110" : "text-muted-foreground"
-        )}>
-          <Shield className="w-6 h-6" />
-          <span className="text-[10px] font-medium">Tracking</span>
-        </Link>
-        
-        <div className="relative -top-6">
-          <div className="w-14 h-14 rounded-full bg-primary shadow-lg shadow-primary/30 flex items-center justify-center border-4 border-background">
-             <Shield className="w-7 h-7 text-white" />
-          </div>
-        </div>
+        {!isEmpOperator ? (
+          <>
+            <Link to="/" className={cn(
+              "flex flex-col items-center gap-1 transition-all duration-300",
+              location.pathname === "/" ? "text-primary scale-110" : "text-muted-foreground"
+            )}>
+              <LayoutDashboard className="w-6 h-6" />
+              <span className="text-[10px] font-medium">Home</span>
+            </Link>
+            <Link to="/book-section/file-tracking" className={cn(
+              "flex flex-col items-center gap-1 transition-all duration-300",
+              location.pathname === "/book-section/file-tracking" ? "text-primary scale-110" : "text-muted-foreground"
+            )}>
+              <Shield className="w-6 h-6" />
+              <span className="text-[10px] font-medium">Tracking</span>
+            </Link>
+            
+            <div className="relative -top-6">
+              <div className="w-14 h-14 rounded-full bg-primary shadow-lg shadow-primary/30 flex items-center justify-center border-4 border-background">
+                 <Shield className="w-7 h-7 text-white" />
+              </div>
+            </div>
 
-        <Link to="/restricted" className={cn(
-          "flex flex-col items-center gap-1 transition-all duration-300",
-          location.pathname === "/restricted" ? "text-primary scale-110" : "text-muted-foreground"
-        )}>
-          <Lock className="w-6 h-6" />
-          <span className="text-[10px] font-medium">Admin</span>
-        </Link>
+            <Link to="/restricted" className={cn(
+              "flex flex-col items-center gap-1 transition-all duration-300",
+              location.pathname === "/restricted" ? "text-primary scale-110" : "text-muted-foreground"
+            )}>
+              <Lock className="w-6 h-6" />
+              <span className="text-[10px] font-medium">Admin</span>
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link to="/book-section/emp-details" className={cn(
+              "flex flex-col items-center gap-1 transition-all duration-300",
+              location.pathname === "/book-section/emp-details" ? "text-primary scale-110" : "text-muted-foreground"
+            )}>
+              <ListTree className="w-6 h-6" />
+              <span className="text-[10px] font-medium">Details</span>
+            </Link>
+            
+            <div className="relative -top-6">
+              <div className="w-14 h-14 rounded-full bg-primary shadow-lg shadow-primary/30 flex items-center justify-center border-4 border-background">
+                 <Users className="w-7 h-7 text-white" />
+              </div>
+            </div>
+
+            <Link to="/book-section/all-employees" className={cn(
+              "flex flex-col items-center gap-1 transition-all duration-300",
+              location.pathname === "/book-section/all-employees" ? "text-primary scale-110" : "text-muted-foreground"
+            )}>
+              <Search className="w-6 h-6" />
+              <span className="text-[10px] font-medium">Search</span>
+            </Link>
+          </>
+        )}
         <button onClick={() => signOut()} className="flex flex-col items-center gap-1 text-red-400">
           <LogOut className="w-6 h-6" />
           <span className="text-[10px] font-medium">Exit</span>

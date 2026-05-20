@@ -45,9 +45,14 @@ const queryClient = new QueryClient();
 const DashboardRedirect = () => {
   const { userRole } = useAuth();
   const isRestrictedAsstCFO = userRole?.startsWith('sub_cfo_') && userRole !== 'sub_cfo';
+  const isEmpOperator = userRole === 'emp_operator';
   
   if (isRestrictedAsstCFO) {
     return <Navigate to="/book-section/file-tracking" replace />;
+  }
+  
+  if (isEmpOperator) {
+    return <Navigate to="/book-section/emp-details" replace />;
   }
   
   return <Dashboard />;
