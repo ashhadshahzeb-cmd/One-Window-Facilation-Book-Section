@@ -20,7 +20,8 @@ import {
   ArrowLeftRight,
   BookOpen,
   Users,
-  Search
+  Search,
+  Landmark
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -56,6 +57,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     { to: "/book-section/file-tracking", icon: Shield, label: "File Tracking", visible: true },
     { to: "/restricted", icon: Lock, label: "Restrict Dashboard", visible: !isRestrictedAsstCFO },
     { to: "/collection-entry", icon: Plus, label: "Collection Entry", visible: !isRestrictedAsstCFO },
+    { to: "/bank-entries", icon: Landmark, label: "Bank Entries", visible: !isRestrictedAsstCFO },
   ].filter(item => item.visible);
 
   const categories = (userRole || isAdmin) && !isRestrictedAsstCFO ? [
